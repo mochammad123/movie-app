@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import Home from "../screens/Home";
 import Favorite from "../screens/Favorite";
 import { Feather } from "@expo/vector-icons";
 import Search from "../screens/Search";
@@ -12,8 +11,8 @@ const BottomTabNavigation = (): JSX.Element => {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="HomeStack"
+        component={HomeStackNavigation}
         options={{
           tabBarIcon: ({ color }) => (
             <Feather name="home" size={28} color={color} />
