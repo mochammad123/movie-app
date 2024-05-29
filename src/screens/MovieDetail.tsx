@@ -4,17 +4,21 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { API_ACCESS_TOKEN } from "react-native-dotenv";
 import { IMovie } from "../types/app";
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import MovieList from "../components/movies/MovieList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const MovieDetail = ({ route }: any): JSX.Element => {
+const MovieDetail = ({ route, navigation }: any): JSX.Element => {
   const [movie, setMovie] = useState<IMovie>();
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { id } = route.params;
+
   const getMovieById = (movieId: number): void => {
     if (API_ACCESS_TOKEN.length == null) {
       throw new Error("ENV not found");
@@ -44,6 +48,65 @@ const MovieDetail = ({ route }: any): JSX.Element => {
     if (id) getMovieById(id);
   }, [id]);
 
+  const addFavorite = async (movie: IMovie): Promise<void> => {
+    try {
+      const initialData: string | null =
+        await AsyncStorage.getItem("@FavoriteList");
+
+      let favMovieList: IMovie[] = [];
+      if (initialData !== null) {
+        favMovieList = [...JSON.parse(initialData), movie];
+      } else {
+        favMovieList = [movie];
+      }
+
+      await AsyncStorage.setItem("@FavoriteList", JSON.stringify(favMovieList));
+      setIsFavorite(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeFavorite = async (id: number): Promise<void> => {
+    try {
+      const initialData: string | null =
+        await AsyncStorage.getItem("@FavoriteList");
+
+      if (initialData !== null) {
+        const favMovieList: IMovie[] = JSON.parse(initialData);
+        const updateFavMovieList = favMovieList.filter(
+          (movie) => movie.id !== id
+        );
+
+        await AsyncStorage.setItem(
+          "@FavoriteList",
+          JSON.stringify(updateFavMovieList)
+        );
+        setIsFavorite(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const checkIsFavorite = async (id: number): Promise<void> => {
+    try {
+      const initialData: string | null =
+        await AsyncStorage.getItem("@FavoriteList");
+      if (initialData !== null) {
+        const favMovieList: IMovie[] = JSON.parse(initialData);
+        const isExist = favMovieList.some((movie) => movie.id === id);
+        setIsFavorite(isExist);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (movie) checkIsFavorite(movie.id);
+  }, [movie]);
+
   return (
     <ScrollView style={[styles.height, styles.backgroundWhite]}>
       <View style={styles.container}>
@@ -61,11 +124,36 @@ const MovieDetail = ({ route }: any): JSX.Element => {
             style={styles.gradientStyle}
           >
             <Text style={styles.movieTitle}>{movie?.title}</Text>
-            <View style={styles.ratingContainer}>
-              <FontAwesome name="star" size={16} color="yellow" />
-              <Text style={styles.rating}>
-                {movie?.vote_average.toFixed(1)}
-              </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <View style={styles.ratingContainer}>
+                <FontAwesome name="star" size={16} color="yellow" />
+                <Text style={styles.rating}>
+                  {movie?.vote_average.toFixed(1)}
+                </Text>
+              </View>
+              {isFavorite ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (movie) removeFavorite(movie.id);
+                  }}
+                >
+                  <AntDesign name="heart" size={24} color="red" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (movie) addFavorite(movie);
+                  }}
+                >
+                  <AntDesign name="hearto" size={24} color="red" />
+                </TouchableOpacity>
+              )}
             </View>
           </LinearGradient>
         </ImageBackground>

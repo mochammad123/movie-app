@@ -41,7 +41,7 @@ export interface Movie {
 }
 
 export interface MovieItemProps {
-  movie: Movie;
+  movie: Movie | IMovie;
   size: { width: number; height: number };
   coverType: "poster" | "backdrop";
 }
@@ -125,3 +125,5 @@ export interface IMovieDetail
   genre_ids: number[];
   media_type: string;
 }
+
+export interface IMovieSearch extends Omit<IMovieDetail, "media_type"> {}
