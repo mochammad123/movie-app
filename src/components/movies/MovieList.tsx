@@ -4,7 +4,7 @@ import { API_ACCESS_TOKEN } from "react-native-dotenv";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import MovieItem from "./MovieItem";
 
-const coverImageSize = {
+export const coverImageSize = {
   backdrop: {
     width: 280,
     height: 160,
