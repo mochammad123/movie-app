@@ -3,7 +3,6 @@ import React from "react";
 import Search from "../screens/Search";
 import MovieDetail from "../screens/MovieDetail";
 import CategorySearchResult from "../components/search/CategorySearchResult";
-import CategorySearch from "../components/search/CategorySearch";
 
 const Stack = createNativeStackNavigator();
 const SearchStackNavigation = () => {

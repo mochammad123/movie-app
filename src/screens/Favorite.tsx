@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  RefreshControl,
   ScrollView,
   StatusBar,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,6 +13,7 @@ import { coverImageSize } from "../components/movies/MovieList";
 
 const Favorite = ({ navigation }: any): JSX.Element => {
   const [movies, setMovies] = useState<IMovie[]>();
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const fetchMovies = async (): Promise<void> => {
     const initialData: string | null =
@@ -26,10 +27,21 @@ const Favorite = ({ navigation }: any): JSX.Element => {
 
   useEffect(() => {
     fetchMovies();
+  }, [refreshing]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 200);
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View
         style={{
           display: "flex",
