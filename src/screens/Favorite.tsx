@@ -10,9 +10,10 @@ import MovieItem from "../components/movies/MovieItem";
 import { IMovie } from "../types/app";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { coverImageSize } from "../components/movies/MovieList";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Favorite = ({ navigation }: any): JSX.Element => {
-  const [movies, setMovies] = useState<IMovie[]>();
+  const [movies, setMovies] = useState<IMovie[]>([]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const fetchMovies = async (): Promise<void> => {
@@ -25,8 +26,16 @@ const Favorite = ({ navigation }: any): JSX.Element => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchMovies();
+    }, [])
+  );
+
   useEffect(() => {
-    fetchMovies();
+    if (refreshing) {
+      fetchMovies();
+    }
   }, [refreshing]);
 
   const onRefresh = useCallback(() => {
